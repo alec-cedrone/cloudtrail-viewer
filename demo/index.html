@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CloudTrail Viewer (Local)</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="header__left">
+      <div class="title">
+        <div class="title__name">CloudTrail Viewer</div>
+        <div class="title__sub">Loads CloudTrail JSON files locally in your browser (no uploads)</div>
+      </div>
+    </div>
+
+    <div class="header__right">
+      <button id="btnPickDirectory" class="btn btn--primary">Select folder (recommended)</button>
+
+      <label class="btn btn--secondary">
+        Select folder (fallback)
+        <input id="fileInput" type="file" webkitdirectory multiple hidden />
+      </label>
+
+      <button id="btnClear" class="btn btn--ghost">Clear</button>
+    </div>
+  </header>
+
+  <section class="toolbar">
+    <div class="toolbar__group">
+      <div class="searchWrap">
+        <input id="searchBox" class="input" type="text" placeholder="Quick filter…" />
+        <span id="badgeFiltered" class="pill" title="How many events match the current filters">Filtered: 0 / 0</span>
+      </div>
+
+      <label class="checkbox">
+        <input id="chkCaseSensitive" type="checkbox" />
+        <span>Case match</span>
+      </label>
+
+      <label class="checkbox">
+        <input id="chkRegex" type="checkbox" />
+        <span>Regex</span>
+      </label>
+
+      <span id="regexError" class="pill pill--danger" style="display:none;" title="Your regex pattern is invalid">
+        Invalid regex
+      </span>
+
+      <select id="sortMode" class="select">
+        <option value="fileThenTime" selected>Sort: File modified time → record eventTime</option>
+        <option value="globalTime">Sort: Global eventTime (across all files)</option>
+      </select>
+
+      <label class="checkbox">
+        <input id="chkHideReadOnlyNoise" type="checkbox" />
+        <span>Hide read-only noise (Get/List/Describe)</span>
+      </label>
+
+      <label class="checkbox">
+        <input id="chkHighlightMatches" type="checkbox" />
+        <span>Highlight matches</span>
+      </label>
+
+      <button id="btnResetFilters" class="btn btn--secondary" title="Clear quick filter + field filters + toggles">
+        Reset filters
+      </button>
+
+      <select id="themeSelect" class="select select--compact" title="Theme">
+        <option value="cumulus-dark" selected>Cumulus Dark</option>
+        <option value="monokai">Monokai</option>
+        <option value="dracula">Dracula</option>
+        <option value="nord">Nord</option>
+        <option value="solarized-dark">Solarized Dark</option>
+        <option value="github-dark">GitHub Dark</option>
+      </select>
+    </div>
+
+    <div class="toolbar__group toolbar__group--right">
+      <div class="statusStack">
+        <div id="activeFilters" class="statusSub">Active filters: none</div>
+        <div id="status" class="status">No data loaded.</div>
+      </div>
+
+      <div class="nav">
+        <button id="btnPrev" class="btn btn--secondary" disabled>Prev</button>
+        <button id="btnNext" class="btn btn--secondary" disabled>Next</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="splitter" id="splitterRoot">
+    <aside class="pane pane--left" id="paneLeft">
+      <div class="pane__header">
+        <div class="pane__title">Files</div>
+        <div id="fileMeta" class="pane__meta"></div>
+      </div>
+      <div id="fileList" class="pane__body filelist"></div>
+    </aside>
+
+    <div class="splitter__bar" id="barLeft" role="separator" aria-orientation="vertical" title="Drag to resize"></div>
+
+    <main class="pane pane--center" id="paneCenter">
+      <div id="eventPanel" class="panel panel--empty">
+        <div class="empty">
+          <div class="empty__title">Select a folder of CloudTrail JSON files</div>
+          <div class="empty__body">
+            <p>Expected: <code>{ "Records": [ ... ] }</code></p>
+            <p>Navigation: <code>←/→</code>, <code>j/k</code>, <code>n/p</code>.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="splitter__bar" id="barRight" role="separator" aria-orientation="vertical" title="Drag to resize"></div>
+
+    <aside class="pane pane--right" id="paneRight">
+      <div class="pane__header">
+        <div class="pane__title">Field filters</div>
+        <div class="pane__meta">Any / Include / Exclude</div>
+      </div>
+
+      <div class="pane__controls">
+        <input id="fieldSearch" class="input input--small" placeholder="Search fields (eventName, userIdentity.arn…)" />
+        <button id="btnClearFieldFilters" class="btn btn--ghost btn--small" title="Clear all Include/Exclude selections">Clear field filters</button>
+      </div>
+
+      <div id="fieldList" class="pane__body fieldlist"></div>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <div class="footer__hint">Your data stays on your machine.</div>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>
